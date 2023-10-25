@@ -63,7 +63,7 @@ class DBManager:
                         if len(vacancies_data['items']) > 0:
                             for vacancie in vacancies_data['items']:
                                 result.append(vacancie)
-                            print(f'vacancies from page {page} add')
+                            print(f'vacancies {company_name} from page {page} add')
                             page += 1
                         else:
                             break
@@ -75,10 +75,6 @@ class DBManager:
                 print(f'Failed to fetch company data. Status Code: {company_response.status_code}')
             time.sleep(random.randint(1, 5))
 
-        # self.cursor.execute(
-        #     'SELECT id FROM companies WHERE id = %s', (company_id,))
-        # existing_company = self.cursor.fetchone()
-        # if not existing_company:
         self.cursor.execute(
             '''INSERT INTO companies (id, name) VALUES (%s, %s) ON CONFLICT (id) DO NOTHING''', (company_id, company_name))
 
@@ -153,16 +149,21 @@ class DBManager:
 
 
 if __name__ == "__main__":
+    companys = ['Домклик', 'URSiP', 'Точка',
+                'Remokate', '7RedLines', 'FunBox', 'getmatch', 'MX21', 'Автостэлс', 'Skyeng']
+
     db_manager = DBManager(dbname=config.dbname, user=config.user,
                            password=config.password, host=config.host, port=config.port)
     db_manager.create_tables()
-    # db_manager.insert_data_by_company('Trud Work')
+
+    for company_name in companys:
+        db_manager.insert_data_by_company(company_name)
 
     companies_and_vacancies = db_manager.get_companies_and_vacancies_count()
     all_vacancies = db_manager.get_all_vacancies()
     avg_salary = db_manager.get_avg_salary()
     high_salary_vacancies = db_manager.get_vacancies_with_higher_salary()
-    keyword_vacancies = db_manager.get_vacancies_with_keyword('Менеджер')
+    keyword_vacancies = db_manager.get_vacancies_with_keyword('python')
     print('companies_and_vacancies', companies_and_vacancies)
     print('all_vacancies:', all_vacancies)
     print('avg_salary:', avg_salary)
